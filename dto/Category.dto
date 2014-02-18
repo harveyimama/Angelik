@@ -1,0 +1,28 @@
+<?php
+include_once('model/AngelikModel.php');
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ * Description of Category
+ *
+ * @author harville
+ */
+class Category {
+   private $categories;
+   private $Category;
+    
+    
+    public function getAllCategories ()
+    {
+         $Category = new AngelikModel();
+         $categories = $Category->getAllCategories(); 
+         
+       
+         return $categories;
+    }
+}
+
+?>
