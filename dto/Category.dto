@@ -13,7 +13,18 @@ include_once('model/AngelikModel.php');
 class Category {
    private $categories;
    private $Category;
+   private $categoryName;
+   
+   
+    public function getCategoryName()
+    {
+        return $this->categoryName;
+    }
     
+     public function setCategoryName($categoryName)
+    {
+         $this->categoryName = $categoryName;
+    }
     
     public function getAllCategories ()
     {
@@ -23,6 +34,8 @@ class Category {
        
          return $categories;
     }
+    
+   
 }
 
 ?>

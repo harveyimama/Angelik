@@ -35,7 +35,20 @@ if (isset($_GET['products']))
 
 if (isset($_GET['categories']))
 {
+$array = array(null, null);
 $postedform = new Mymodule();
+$postedform->setpostedFeildValue($array);
+$postedform->processCategoryPage();
+   
+   
+}
+
+
+if (isset($_POST['category']))
+{
+$array = array($_POST['category']);
+$postedform = new Mymodule();
+$postedform->setpostedFeildValue($array);
 $postedform->processCategoryPage();
    
    

@@ -7,8 +7,9 @@
     <body>
         <?php
        
-        echo   $categoryreport->renderReport();
-       
+         echo   $successfulluserdashboard->renderDashBoard();
+         echo   $categoryreport->renderReport();
+         echo   $myForm->renderForm('Create Category');
         ?>
     </body>
 </html>

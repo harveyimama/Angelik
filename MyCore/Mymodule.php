@@ -112,43 +112,32 @@ if (!isset($this->postedfeildvalue[0]))
  }
     
  
-  public function processHomePage()
+  public function processDashBoard()
  {
         $dashboardinstance =  new MyDashBoard();
         $roleinstance = new MyRole();
         
         $successfulluserrole = $roleinstance->setRole($_SESSION['role_id']);
         
-        $successfulluserdashboard = $dashboardinstance->setDashBoard($successfulluserrole, '', 'Welcome :'.$_SESSION['fullname']);
+        return $dashboardinstance->setDashBoard($successfulluserrole, '', 'Welcome :'.$_SESSION['fullname']);
+        
+       
+ }
+ 
+ 
+   public function processHomePage()
+ {
+        $mymodule =  new MyModule();
+        $successfulluserdashboard = $mymodule->processDashBoard();
         
         include  'Mypages/homepage.php';
  }
  
  
- public function processTransactionPage()
- {
-   
-     $alltransactions = new Transaction();
-     
-     $transactionarray = $alltransactions->getAllTransactions();
-     
-     $columnInstance = new MyColumn();
-
-     $itemcolum = $columnInstance->setcolumn($columnDiv, $columnName, $columnLink, $transactionarray[$columnName], $columnValue, $columnDisplayName);
-
-     $categorycolumn = $columnInstance->setcolumn($columnDiv, $columnName, $columnLink, $transactionarray[$columnName], $columnValue, $columnDisplayName);
-
-     
-    $reportinstance = new MyReport();
-        
-    $transactionreport = $reportinstance->setReport($reportName, $reportColumns, $reportDiv, $reportId);
-    include  'Mypages/transaction.php'; 
- }
- 
  
  public function processCategoryPage()
  {
-   
+    //below is the code that gets the transactions
      $allcategoriess = new Category();
      
      $categoryarray = $allcategoriess->getAllCategories();
@@ -174,12 +163,85 @@ if (!isset($this->postedfeildvalue[0]))
      $numberofsalescolumn = $columnInstance->setcolumn('', 'noSales', 'show_transactions',$number_of_sales, null, 'Number of Sales');
 
      $columnarray =array($idcolumn,$categorycolumn,$productcountcolumn,$totalsalescolumn,$numberofsalescolumn,$editcolumn);
-    $reportinstance = new MyReport();
+     $reportinstance = new MyReport();
+       
+     $categoryreport = $reportinstance->setReport('All Categories', $columnarray, '', '');
+     
+     //below is the dashboard code
+    
+        $mymodule =  new MyModule();
+        $successfulluserdashboard = $mymodule->processDashBoard();
         
-    $categoryreport = $reportinstance->setReport('All Categories', $columnarray, '', '');
+    //below is the code that gets the new form
+        
+         //declare all expected feilds   
+$feildInstance = new MyFeild();
+
+$categoryfeild = $feildInstance->setfeild('','category','category','input','y',$this->postedfeildvalue[0],'New Category');
+
+$feilds = array($categoryfeild);
+
+$fromInstance = new MyForm();
+
+//validate feilds if this form was posted
+
+if($this->postedfeildvalue[0] !== null)
+{
+  
+    $feildarray = $fromInstance->validateFeilds($feilds);
+   
+}
+
+//if form was posted and validated sucessfully, perform your operation
+
+if($this->postedfeildvalue[0] !== null and $fromInstance->validation_error_count == 0)
+ {
+ 
+  $propectiveCategory =  new Category();
+  $propectiveCategory->setpassword($this->postedfeildvalue[1]);
+  $propectiveUser->setusername($this->postedfeildvalue[0]);
+  $return_code =  $propectiveUser->allocateUserSession();
+    
+    if ($return_code !== -1)
+    {
+        $hompage =  new Mymodule();
+        $hompage->processHomePage();
+    }
+ }
+
+
+//if form wasnt posted or validation error occured or posted data did not meet business need, create form
+if($this->postedfeildvalue[0] == null or $fromInstance->validation_error_count > 0 or $return_code == -1)
+{
+   
+   if (isset($feildarray))
+   {
+   $myForm = $fromInstance->setForm('NewCategoryForm', 'Category', $feildarray,'Category', '', 'Category');
+   }
+ else {
+    $myForm = $fromInstance->setForm('NewCategoryForm', 'Category', $feilds,'Category', '', 'Category');      
+   }
+}
+
+//create message for rejected form
+if ($this->postedfeildvalue[0] !== null and ($fromInstance->validation_error_count > 0 or $return_code == -1) )
+    {
+     
+    if($fromInstance->validation_error_count > 0)
+    {
+    $myForm->setFormError('Error processing Category');
+    }
+ else {
+     $myForm->setFormError('Category already Exists');   
+    }
+  
+    
+    }
+   
     include  'Mypages/category.php'; 
  }
 
+ 
 
 }
 ?>
