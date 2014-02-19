@@ -137,35 +137,6 @@ if (!isset($this->postedfeildvalue[0]))
  
  public function processCategoryPage()
  {
-    //below is the code that gets the transactions
-     $allcategoriess = new Category();
-     
-     $categoryarray = $allcategoriess->getAllCategories();
-  
-     foreach ($categoryarray as $category)
-     {
-         $name[] =  $category['NAME'];
-         $id[] =  $category['ID'];
-         $product_count[] =  $category['PRODUCT_COUNT'];
-         $total_sales[] =  $category['TOTAL_SALES'];
-         $number_of_sales[] =  $category['NUMBER_OF_SALES'];
-     }
- 
-         
-     $columnInstance = new MyColumn();
-       
-     
-     $idcolumn = $columnInstance->setcolumn('', 'ID', '', $id, null, 'Product ID');
-     $categorycolumn = $columnInstance->setcolumn('', 'Name', 'show_category', $name, null, 'Category Name');
-     $editcolumn = $columnInstance->setcolumn('', 'Edit', 'edit_category', null, 'Edit', '');
-     $productcountcolumn = $columnInstance->setcolumn('', 'noProducts', 'show_products', $product_count, null, 'No Of Products');
-     $totalsalescolumn = $columnInstance->setcolumn('', 'totalSales', 'show_transactions',$total_sales, null, 'Total Sales');
-     $numberofsalescolumn = $columnInstance->setcolumn('', 'noSales', 'show_transactions',$number_of_sales, null, 'Number of Sales');
-
-     $columnarray =array($idcolumn,$categorycolumn,$productcountcolumn,$totalsalescolumn,$numberofsalescolumn,$editcolumn);
-     $reportinstance = new MyReport();
-       
-     $categoryreport = $reportinstance->setReport('All Categories', $columnarray, '', '');
      
      //below is the dashboard code
     
@@ -198,20 +169,14 @@ if($this->postedfeildvalue[0] !== null and $fromInstance->validation_error_count
  {
  
   $propectiveCategory =  new Category();
-  $propectiveCategory->setpassword($this->postedfeildvalue[1]);
-  $propectiveUser->setusername($this->postedfeildvalue[0]);
-  $return_code =  $propectiveUser->allocateUserSession();
+  $propectiveCategory->setCategoryName($this->postedfeildvalue[0]);
+  $return_code =  $propectiveCategory->createNewCategory();
     
-    if ($return_code !== -1)
-    {
-        $hompage =  new Mymodule();
-        $hompage->processHomePage();
-    }
  }
 
 
 //if form wasnt posted or validation error occured or posted data did not meet business need, create form
-if($this->postedfeildvalue[0] == null or $fromInstance->validation_error_count > 0 or $return_code == -1)
+if($this->postedfeildvalue[0] == null or $fromInstance->validation_error_count > 0 or isset($return_code))
 {
    
    if (isset($feildarray))
@@ -224,19 +189,53 @@ if($this->postedfeildvalue[0] == null or $fromInstance->validation_error_count >
 }
 
 //create message for rejected form
-if ($this->postedfeildvalue[0] !== null and ($fromInstance->validation_error_count > 0 or $return_code == -1) )
+if ($this->postedfeildvalue[0] !== null and ($fromInstance->validation_error_count > 0 or isset($return_code)) )
     {
      
     if($fromInstance->validation_error_count > 0)
     {
     $myForm->setFormError('Error processing Category');
     }
- else {
+ elseif ($return_code == '-2') {
      $myForm->setFormError('Category already Exists');   
+    }
+     elseif ($return_code == '0') {
+     $myForm->setFormError('Success');   
     }
   
     
     }
+    
+    //below is the code that gets the transactions
+     $allcategoriess = new Category();
+     
+     $categoryarray = $allcategoriess->getAllCategories();
+  
+     foreach ($categoryarray as $category)
+     {
+         $name[] =  $category['NAME'];
+         $id[] =  $category['ID'];
+         $product_count[] =  $category['PRODUCT_COUNT'];
+         $total_sales[] =  $category['TOTAL_SALES'];
+         $number_of_sales[] =  $category['NUMBER_OF_SALES'];
+     }
+ 
+         
+     $columnInstance = new MyColumn();
+       
+     
+     $idcolumn = $columnInstance->setcolumn('', 'ID', '', $id, null, 'Product ID');
+     $categorycolumn = $columnInstance->setcolumn('', 'Name', '', $name, null, 'Category Name');
+     $editcolumn = $columnInstance->setcolumn('', 'Edit', 'edit_category', null, 'Edit', '');
+     $productcountcolumn = $columnInstance->setcolumn('', 'noProducts', 'show_products', $product_count, null, 'No Of Products');
+     $totalsalescolumn = $columnInstance->setcolumn('', 'totalSales', 'show_transactions',$total_sales, null, 'Total Sales');
+     $numberofsalescolumn = $columnInstance->setcolumn('', 'noSales', 'show_transactions',$number_of_sales, null, 'Number of Sales');
+
+     $columnarray =array($idcolumn,$categorycolumn,$productcountcolumn,$totalsalescolumn,$numberofsalescolumn,$editcolumn);
+     $reportinstance = new MyReport();
+       
+     $categoryreport = $reportinstance->setReport('All Categories', $columnarray, '', '');
+    
    
     include  'Mypages/category.php'; 
  }

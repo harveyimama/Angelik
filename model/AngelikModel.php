@@ -57,6 +57,25 @@ class AngelikModel {
         return $array;
     }
     
+    public function crtCategory($c)
+    {
+        $link = new Myconnection;
+        $link->connect();
+        $ret = -1;
+        $stmt = $link->connection->prepare("call crt_category_sp(?,@out)");
+        $stmt->bindParam(1, $c,PDO::PARAM_STR);
+       
+
+        $stmt->execute();
+
+        while ($myrow = $stmt->fetch())
+        {
+        $ret =  $myrow['ret'];
+        
+        }
+                return $ret;
+    }
+    
     
 }
 
